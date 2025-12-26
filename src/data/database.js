@@ -263,15 +263,23 @@ export const neckRoutine = [
     { exercise: 'Isometric Holds', sets: '4x30-sec holds', progression: 'Increase resistance' }
 ]
 
-// Workout types for logging
+// Workout types for logging (matches training split days)
 export const workoutTypes = [
-    'Push 1',
-    'Push 2',
-    'Pull 1',
-    'Pull 2',
-    'Leg 1',
-    'Leg 2',
-    'Rest'
+    'Push Strength',
+    'Pull + Conditioning',
+    'Legs (Power)',
+    'Bodyweight + Explosive',
+    'Legs + Explosiveness',
+    'Upper + Core + Neck',
+    'Active Recovery'
+]
+
+// Conditioning types for logging
+export const conditioningTypes = [
+    'Circuit A - High-Intensity',
+    'Circuit B - Explosive Power',
+    'Circuit C - Grip & Core',
+    'Circuit D - Sprint Work'
 ]
 
 // Meal types

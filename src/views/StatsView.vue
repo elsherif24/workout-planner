@@ -216,7 +216,11 @@
               </div>
               <div class="cons-stat">
                 <span class="cons-value">{{ conditioningCount }}</span>
-                <span class="cons-label">Conditioning Sessions</span>
+                <span class="cons-label">Conditioning</span>
+              </div>
+              <div class="cons-stat">
+                <span class="cons-value">{{ neckCount }}</span>
+                <span class="cons-label">Neck Workouts</span>
               </div>
             </div>
             
@@ -227,10 +231,15 @@
                 :key="day.date"
                 class="heatmap-day"
                 :class="getHeatmapClass(day)"
-                :title="day.date"
+                :title="getHeatmapTooltip(day)"
               ></div>
             </div>
-            <p class="heatmap-legend">Last 30 days</p>
+            <div class="heatmap-legend-row">
+              <span class="legend-item"><span class="legend-dot"></span> Rest</span>
+              <span class="legend-item"><span class="legend-dot level-1"></span> Workout</span>
+              <span class="legend-item"><span class="legend-dot level-2"></span> +1 Extra</span>
+              <span class="legend-item"><span class="legend-dot level-3"></span> Full Day</span>
+            </div>
           </div>
 
           <!-- Sleep & Steps -->
@@ -421,6 +430,13 @@ export default {
         new Date(w.date) >= monthAgo && w.conditioning
       ).length
     },
+    neckCount() {
+      const monthAgo = new Date()
+      monthAgo.setDate(monthAgo.getDate() - 30)
+      return store.workouts.filter(w => 
+        new Date(w.date) >= monthAgo && w.neckDone
+      ).length
+    },
     last30Days() {
       const days = []
       const today = new Date()
@@ -432,7 +448,8 @@ export default {
         days.push({
           date: dateStr,
           hasWorkout: workout && workout.type && workout.type !== 'Rest',
-          hasConditioning: workout && workout.conditioning
+          hasConditioning: workout && workout.conditioning,
+          hasNeck: workout && workout.neckDone
         })
       }
       return days
@@ -508,9 +525,25 @@ export default {
       return count > 0 ? (total / count).toFixed(1) : 0
     },
     getHeatmapClass(day) {
-      if (day.hasConditioning) return 'conditioning'
-      if (day.hasWorkout) return 'workout'
-      return 'rest'
+      // Count how many activities were done
+      let score = 0
+      if (day.hasWorkout) score++
+      if (day.hasConditioning) score++
+      if (day.hasNeck) score++
+      
+      // Return intensity level
+      if (score === 3) return 'level-3'  // Full day: workout + conditioning + neck
+      if (score === 2) return 'level-2'  // Good: workout + one extra
+      if (score === 1) return 'level-1'  // Base: just workout (still good!)
+      return 'rest'                       // No activity
+    },
+    getHeatmapTooltip(day) {
+      const parts = [day.date]
+      if (day.hasWorkout) parts.push('Workout')
+      if (day.hasConditioning) parts.push('Conditioning')
+      if (day.hasNeck) parts.push('Neck')
+      if (parts.length === 1) parts.push('Rest')
+      return parts.join(' - ')
     },
     // E1RM calculation using Epley formula
     // E1RM = weight × (1 + reps / 30)
@@ -901,12 +934,17 @@ export default {
   background: var(--bg-tertiary);
 }
 
-.heatmap-day.workout {
-  background: var(--cut-primary);
+.heatmap-day.level-1 {
+  background: #0e4429;  /* Dark green - base workout */
 }
 
-.heatmap-day.conditioning {
-  background: var(--bulk-primary);
+.heatmap-day.level-2 {
+  background: #26a641;  /* Medium green - workout + 1 extra */
+}
+
+.heatmap-day.level-3 {
+  background: #39d353;  /* Bright green - full day! */
+  box-shadow: 0 0 8px rgba(57, 211, 83, 0.5);
 }
 
 .heatmap-legend {
@@ -914,6 +952,40 @@ export default {
   font-size: 0.75rem;
   color: var(--text-muted);
   text-align: center;
+}
+
+.heatmap-legend-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--bg-tertiary);
+}
+
+.legend-dot.level-1 {
+  background: #0e4429;
+}
+
+.legend-dot.level-2 {
+  background: #26a641;
+}
+
+.legend-dot.level-3 {
+  background: #39d353;
 }
 
 /* Habit Stats */

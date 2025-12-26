@@ -79,13 +79,13 @@
             </div>
 
             <div v-if="workout.conditioning" class="form-group mt-md">
-              <label class="label">Conditioning Notes</label>
-              <input 
-                type="text" 
-                class="input" 
-                v-model="workout.conditioningNote"
-                placeholder="Circuit A, sprints, etc."
-              />
+              <label class="label">Conditioning Type</label>
+              <select class="select" v-model="workout.conditioningType">
+                <option value="">Select type...</option>
+                <option v-for="type in conditioningTypes" :key="type" :value="type">
+                  {{ type }}
+                </option>
+              </select>
             </div>
 
             <div class="toggle-row">
@@ -290,6 +290,7 @@ import {
   workoutTypes, 
   trainingSplit, 
   conditioningProtocols, 
+  conditioningTypes,
   neckRoutine,
   strengthExercises 
 } from '../data/database.js'
@@ -304,7 +305,7 @@ export default {
       workout: {
         type: '',
         conditioning: false,
-        conditioningNote: '',
+        conditioningType: '',
         neckDone: false,
         neckWorkout: '',
         steps: null,
@@ -317,6 +318,7 @@ export default {
       workoutTypes,
       trainingSplit,
       conditioningProtocols,
+      conditioningTypes,
       neckRoutine,
       strengthExercises
     }
@@ -350,7 +352,7 @@ export default {
         this.workout = {
           type: '',
           conditioning: false,
-          conditioningNote: '',
+          conditioningType: '',
           neckDone: false,
           neckWorkout: '',
           steps: null,
