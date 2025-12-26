@@ -90,6 +90,14 @@
         <span class="icon">📊</span>
         <span>Stats</span>
       </router-link>
+      <router-link 
+        to="/rewind" 
+        class="nav-item"
+        :class="{ active: $route.path === '/rewind' }"
+      >
+        <span class="icon">⏪</span>
+        <span>Rewind</span>
+      </router-link>
     </nav>
   </div>
 </template>
